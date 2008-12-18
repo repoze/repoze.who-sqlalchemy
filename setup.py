@@ -31,7 +31,7 @@ setup(name='repoze.who.plugins.sqlalchemy',
       description=('The repoze.who SQLAlchemy plugin'),
       long_description=README,
       classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         ],
