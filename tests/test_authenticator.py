@@ -23,8 +23,8 @@ import unittest
 from zope.interface.verify import verifyClass
 from repoze.who.interfaces import IAuthenticator
 
-from repoze.who.plugins.sqlachemy import SQLAlchemyAuthenticatorPlugin, \
-                                         make_sa_authenticator
+from repoze.who.plugins.sa import SQLAlchemyAuthenticatorPlugin, \
+                                  make_sa_authenticator
 
 import databasesetup_sa, databasesetup_elixir
 from fixture import sa_model, elixir_model
@@ -98,14 +98,22 @@ class TestAuthenticatorMaker(unittest.TestCase):
     def test_simple_call(self):
         user_class = 'tests.fixture.sa_model:User'
         dbsession = 'tests.fixture.sa_model:DBSession'
-        authenticator = make_sa_authenticator(user_class, user_class)
+        authenticator = make_sa_authenticator(user_class, dbsession)
         self.assertTrue(isinstance(authenticator, SQLAlchemyAuthenticatorPlugin))
+    
+    def test_no_user_class(self):
+        dbsession = 'tests.fixture.sa_model:DBSession'
+        self.assertRaises(ValueError, make_sa_authenticator, None, dbsession)
+    
+    def test_no_dbsession(self):
+        user_class = 'tests.fixture.sa_model:User'
+        self.assertRaises(ValueError, make_sa_authenticator, user_class)
     
     def test_username_translation(self):
         user_class = 'tests.fixture.sa_model:User'
         dbsession = 'tests.fixture.sa_model:DBSession'
         username_translation = 'username'
-        authenticator = make_sa_authenticator(user_class, user_class,
+        authenticator = make_sa_authenticator(user_class, dbsession,
                                               username_translation)
         self.assertTrue(isinstance(authenticator, SQLAlchemyAuthenticatorPlugin))
         self.assertEqual(username_translation,
@@ -117,7 +125,7 @@ class TestAuthenticatorMaker(unittest.TestCase):
         password_validator_translation = 'verify_pass'
         authenticator = make_sa_authenticator(
             user_class,
-            user_class,
+            dbsession,
             validate_password_translation=password_validator_translation)
         self.assertTrue(isinstance(authenticator, SQLAlchemyAuthenticatorPlugin))
         self.assertEqual(password_validator_translation,

@@ -26,7 +26,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 version = open(os.path.join(here, 'VERSION.txt')).readline().rstrip()
 
-setup(name='repoze.who.plugins.sqlalchemy',
+setup(name='repoze.who.plugins.sa',
       version=version,
       description=('The repoze.who SQLAlchemy plugin'),
       long_description=README,
@@ -39,7 +39,7 @@ setup(name='repoze.who.plugins.sqlalchemy',
       author="Gustavo Narea",
       author_email="repoze-dev@lists.repoze.org",
       namespace_packages=['repoze', 'repoze.who', 'repoze.who.plugins'],
-      url="http://code.gustavonarea.net/repoze.who.plugins.sqlalchemy/",
+      url="http://code.gustavonarea.net/repoze.who.plugins.sa/",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,

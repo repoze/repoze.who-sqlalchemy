@@ -25,7 +25,38 @@ __all__ = ['SQLAlchemyAuthenticatorPlugin', 'make_sa_authenticator']
 
 
 class SQLAlchemyAuthenticatorPlugin(object):
-    """repoze.who authenticator for SQLAlchemy models."""
+    """
+    repoze.who authenticator for SQLAlchemy models.
+    
+    Example::
+    
+        from repoze.who.plugins.sa import SQLAlchemyAuthenticatorPlugin
+        from yourcoolproject.model import User, DBSession
+        
+        authenticator = SQLAlchemyAuthenticatorPlugin(User, DBSession)
+    
+    This plugin assumes that the user name is kept in the ``user_name``
+    attribute of the users' class, as well as that such a class has a method
+    that verifies the user's password against the password provided through the
+    login form (it receives the password to be verified as the only argument
+    and such method is assumed to be called ``validate_password``).
+    
+    If you don't want to call the attributes below as ``user_name`` and/or
+    ``validate_password``, respectively, then you have to "translate" them as
+    in the sample below::
+    
+        # You have User.username instead of User.user_name:
+        authenticator.translations['user_name'] = 'username'
+        
+        # You have User.verify_password instead of User.validate_password:
+        authenticator.translations['validate_password'] = 'verify_password'
+    
+    .. note::
+    
+        If you want to configure this authenticator from an ``ini`` file, use
+        :func:`make_sa_authenticator`.
+    
+    """
     
     implements(IAuthenticator)
     
@@ -69,7 +100,39 @@ class SQLAlchemyAuthenticatorPlugin(object):
 def make_sa_authenticator(user_class=None, dbsession=None, 
                           user_name_translation=None, 
                           validate_password_translation=None):
-    """Setup an SQLAlchemy authenticator"""
+    """
+    Configure :class:`SQLAlchemyAuthenticatorPlugin`.
+    
+    :param user_class: The SQLAlchemy/Elixir class for the users.
+    :type user_class: str
+    :param dbsession: The SQLAlchemy/Elixir session.
+    :type dbsession: str
+    :param user_name_translation: The translation for ``user_name``, if any.
+    :type user_name_translation: str
+    :param validate_password_translation: The translation for ``validate_password``, if any.
+    :type validate_password_translation: str
+    
+    Example from an ``*.ini`` file::
+    
+        # ...
+        [plugin:sa_auth]
+        use = repoze.who.plugins.sa:make_sa_authenticator
+        user_class = yourcoolproject.model:User
+        dbsession = yourcoolproject.model:DBSession
+        # ...
+    
+    Or, if you need translations::
+    
+        # ...
+        [plugin:sa_auth]
+        use = repoze.who.plugins.sa:make_sa_authenticator
+        user_class = yourcoolproject.model:User
+        dbsession = yourcoolproject.model:DBSession
+        user_name_translation = username
+        validate_password_translation = verify_password
+        # ...
+    
+    """
     
     if user_class is None:
         raise ValueError('user_class must not be None')
