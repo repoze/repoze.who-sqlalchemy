@@ -22,7 +22,7 @@ from sqlalchemy.orm import *
 from cStringIO import StringIO
 from cgi import FieldStorage
 
-from fixture.sa_model import init_model, DBSession, metadata, User
+from fixture.sa_model import init_model, DBSession, metadata, User, Member
 
 engine = create_engine(os.environ.get('DBURL', 'sqlite://'))
 
@@ -58,6 +58,41 @@ def setup_database():
     user.user_name = u'rasmus'
     user.password = u'php'
     DBSession.save(user)
+
+    DBSession.commit()
+
+def setup_database_with_translations():
+    init_model(engine)
+    teardownDatabase()
+    metadata.create_all(engine)
+    
+    # Creating members
+
+    member = Member()
+    member.member_name = u'rms'
+    member.password = u'freedom'
+    DBSession.save(member)
+
+    member = Member()
+    member.member_name = u'linus'
+    member.password = u'linux'
+    DBSession.save(member)
+
+    member = Member()
+    member.member_name = u'sballmer'
+    member.password = u'developers'
+    DBSession.save(member)
+
+    # Plus a couple of members without groups
+    member = Member()
+    member.member_name = u'guido'
+    member.password = u'phytonic'
+    DBSession.save(member)
+
+    member = Member()
+    member.member_name = u'rasmus'
+    member.password = u'php'
+    DBSession.save(member)
 
     DBSession.commit()
 

@@ -85,12 +85,13 @@ class SQLAlchemyAuthenticatorPlugin(object):
         
         query = self.dbsession.query(self.user_class)
         query = query.filter(username==identity['login'])
+        
         try:
             user = query.one()
             # Getting the other translation:
             validator = getattr(user, self.translations['validate_password'])
             if validator(identity['password']):
-                return user.user_name
+                return getattr(user, self.translations['user_name'])
         except (NoResultFound, MultipleResultsFound):
             # As recommended in the docs for repoze.who, it's important to
             # verify that there's only _one_ matching userid.

@@ -90,3 +90,56 @@ class User(DeclarativeBase):
         @type password: unicode object
         """
         return self.password == self.__encrypt_password(password)
+
+
+class Member(DeclarativeBase):
+    """Reasonably basic User definition. Probably would want additional
+    attributes.
+    
+    It uses non-default attributes, so it'll have to be translated.
+    
+    """
+    __tablename__ = 'member'
+
+    member_id = Column(Integer, autoincrement=True, primary_key=True)
+
+    member_name = Column(Unicode(16), unique=True)
+
+    _password = Column('password', Unicode(40))
+
+    def _set_password(self, password):
+        """encrypts password on the fly."""
+        self._password = self.__encrypt_password(password)
+
+    def _get_password(self):
+        """returns password"""
+        return self._password
+
+    password = synonym('password', descriptor=property(_get_password,
+                                                       _set_password))
+
+    def __encrypt_password(self, password):
+        """Hash the given password with SHA1."""
+        
+        if isinstance(password, unicode):
+            password_8bit = password.encode('UTF-8')
+
+        else:
+            password_8bit = password
+
+        hashed_password = sha1()
+        hashed_password.update(password_8bit)
+        hashed_password = hashed_password.hexdigest()
+
+        # make sure the hased password is an UTF-8 object at the end of the
+        # process because SQLAlchemy _wants_ a unicode object for Unicode columns
+        if not isinstance(hashed_password, unicode):
+            hashed_password = hashed_password.decode('UTF-8')
+
+        return hashed_password
+
+    def verify_pass(self, password):
+        """Check the password against existing credentials.
+        this method _MUST_ return a boolean.
+        """
+        return self.password == self.__encrypt_password(password)

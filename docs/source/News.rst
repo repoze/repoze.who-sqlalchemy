@@ -5,6 +5,15 @@
 This document describes the releases of :mod:`repoze.who.plugins.sa`.
 
 
+.. _repoze.who.plugins.sa-1.0b3:
+
+:mod:`repoze.who.plugins.sa` 1.0b3 (2009-01-08)
+===============================================
+
+Fixed `Bug #56 <http://bugs.repoze.org/issue56>`_ (``User.user_name`` was
+not translatable).
+
+
 .. _repoze.who.plugins.sa-1.0b2:
 
 :mod:`repoze.who.plugins.sa` 1.0b2 (2008-12-18)

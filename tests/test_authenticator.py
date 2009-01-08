@@ -35,7 +35,8 @@ class TestAuthenticator(unittest.TestCase):
     
     def setUp(self):
         databasesetup_sa.setup_database()
-        self.plugin = SQLAlchemyAuthenticatorPlugin(sa_model.User, sa_model.DBSession)
+        self.plugin = SQLAlchemyAuthenticatorPlugin(sa_model.User, 
+                                                    sa_model.DBSession)
     
     def tearDown(self):
         databasesetup_sa.teardownDatabase()
@@ -71,6 +72,26 @@ class TestAuthenticator(unittest.TestCase):
         # Updating the translations...
         self.plugin.translations['user_name'] = 'userid'
         self.plugin.translations['validate_password'] = 'validator'
+        # Testing it...
+        identity = {'login': u'rms', 'password': u'freedom'}
+        self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
+
+
+class TestAuthenticatorWithTranslations(unittest.TestCase):
+    """Tests for the authenticator function"""
+    
+    def setUp(self):
+        databasesetup_sa.setup_database_with_translations()
+    
+    def tearDown(self):
+        databasesetup_sa.teardownDatabase()
+    
+    def test_it(self):
+        self.plugin = SQLAlchemyAuthenticatorPlugin(sa_model.Member, 
+                                                    sa_model.DBSession)
+        # Updating the translations...
+        self.plugin.translations['user_name'] = 'member_name'
+        self.plugin.translations['validate_password'] = 'verify_pass'
         # Testing it...
         identity = {'login': u'rms', 'password': u'freedom'}
         self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
