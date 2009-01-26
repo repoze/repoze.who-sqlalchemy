@@ -2,7 +2,7 @@
 ===================================
 
 .. module:: repoze.who.plugins.sa
-    :synopsis: SQLAlchemy/Elixir-based authenticator for repoze.who
+    :synopsis: SQLAlchemy/Elixir-based plugins for repoze.who
 .. moduleauthor:: Gustavo Narea <me@gustavonarea.net>
 
 :Author: Gustavo Narea.
@@ -10,8 +10,8 @@
 
 .. topic:: Overview
 
-    The :mod:`repoze.who` SQLAlchemy plugin provides an authenticator plugin
-    for SQLAlchemy or Elixir-based models. 
+    The :mod:`repoze.who` SQLAlchemy plugin provides an authenticator and
+    a metadata provider plugins for SQLAlchemy or Elixir-based models. 
 
 
 How to install
