@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2008, Gustavo Narea <me@gustavonarea.net>
+# Copyright (c) 2008-2009, Gustavo Narea <me@gustavonarea.net>
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
@@ -36,28 +36,28 @@ def setup_database():
     user = User()
     user.user_name = u'rms'
     user.password = u'freedom'
-    DBSession.save(user)
+    DBSession.add(user)
 
     user = User()
     user.user_name = u'linus'
     user.password = u'linux'
-    DBSession.save(user)
+    DBSession.add(user)
 
     user = User()
     user.user_name = u'sballmer'
     user.password = u'developers'
-    DBSession.save(user)
+    DBSession.add(user)
 
     # Plus a couple of users without groups
     user = User()
     user.user_name = u'guido'
     user.password = u'phytonic'
-    DBSession.save(user)
+    DBSession.add(user)
 
     user = User()
     user.user_name = u'rasmus'
     user.password = u'php'
-    DBSession.save(user)
+    DBSession.add(user)
 
     DBSession.commit()
 
