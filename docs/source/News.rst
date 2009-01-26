@@ -5,6 +5,15 @@
 This document describes the releases of :mod:`repoze.who.plugins.sa`.
 
 
+.. _repoze.who.plugins.sa-1.0rc1:
+
+:mod:`repoze.who.plugins.sa` 1.0rc1 (2009-01-26)
+================================================
+* Introduced the :class:`repoze.who.plugins.sa.SQLAlchemyUserMDPlugin` metadata
+  provider.
+* Minor docstring fixes.
+
+
 .. _repoze.who.plugins.sa-1.0b3:
 
 :mod:`repoze.who.plugins.sa` 1.0b3 (2009-01-08)

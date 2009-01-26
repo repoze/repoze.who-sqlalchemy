@@ -34,6 +34,15 @@ Authenticator
 
 .. autofunction:: make_sa_authenticator
 
+
+Metadata provider
+=================
+
+.. autoclass:: SQLAlchemyUserMDPlugin
+
+.. autofunction:: make_sa_user_mdprovider
+
+
 How to get help?
 ================
 
