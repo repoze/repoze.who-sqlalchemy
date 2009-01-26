@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2008, Gustavo Narea <me@gustavonarea.net>
+# Copyright (c) 2008-2009, Gustavo Narea <me@gustavonarea.net>
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the BSD-like license at
@@ -14,7 +14,7 @@
 ##############################################################################
 
 """
-Tests for the repoze.what SQL quickstart.
+Tests for the repoze.who SQLAlchemy authenticator.
 
 """
 
@@ -42,7 +42,8 @@ class TestAuthenticator(unittest.TestCase):
         databasesetup_sa.teardownDatabase()
 
     def test_implements(self):
-        verifyClass(IAuthenticator, SQLAlchemyAuthenticatorPlugin, tentative=True)
+        verifyClass(IAuthenticator, SQLAlchemyAuthenticatorPlugin, 
+                    tentative=True)
         
     def test_no_identity(self):
         identity = {}
@@ -59,20 +60,6 @@ class TestAuthenticator(unittest.TestCase):
         self.assertEqual(None, self.plugin.authenticate(None, identity))
         
     def test_match(self):
-        identity = {'login': u'rms', 'password': u'freedom'}
-        self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
-    
-    def test_translations(self):
-        # Changing the names...
-        user = self.plugin.user_class
-        user.userid = user.user_name
-        user.validator = user.validate_password
-        del user.user_name
-        del user.validate_password
-        # Updating the translations...
-        self.plugin.translations['user_name'] = 'userid'
-        self.plugin.translations['validate_password'] = 'validator'
-        # Testing it...
         identity = {'login': u'rms', 'password': u'freedom'}
         self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
 
@@ -120,7 +107,8 @@ class TestAuthenticatorMaker(unittest.TestCase):
         user_class = 'tests.fixture.sa_model:User'
         dbsession = 'tests.fixture.sa_model:DBSession'
         authenticator = make_sa_authenticator(user_class, dbsession)
-        self.assertTrue(isinstance(authenticator, SQLAlchemyAuthenticatorPlugin))
+        self.assertTrue(isinstance(authenticator, 
+                                   SQLAlchemyAuthenticatorPlugin))
     
     def test_no_user_class(self):
         dbsession = 'tests.fixture.sa_model:DBSession'
@@ -136,7 +124,8 @@ class TestAuthenticatorMaker(unittest.TestCase):
         username_translation = 'username'
         authenticator = make_sa_authenticator(user_class, dbsession,
                                               username_translation)
-        self.assertTrue(isinstance(authenticator, SQLAlchemyAuthenticatorPlugin))
+        self.assertTrue(isinstance(authenticator, 
+                                   SQLAlchemyAuthenticatorPlugin))
         self.assertEqual(username_translation,
                          authenticator.translations['user_name'])
     
@@ -148,6 +137,7 @@ class TestAuthenticatorMaker(unittest.TestCase):
             user_class,
             dbsession,
             validate_password_translation=password_validator_translation)
-        self.assertTrue(isinstance(authenticator, SQLAlchemyAuthenticatorPlugin))
+        self.assertTrue(isinstance(authenticator, 
+                                   SQLAlchemyAuthenticatorPlugin))
         self.assertEqual(password_validator_translation,
                          authenticator.translations['validate_password'])
