@@ -137,7 +137,7 @@ class SQLAlchemyUserMDPlugin(_BaseSQLAlchemyPlugin):
     below::
     
         # You have User.username instead of User.user_name:
-        authenticator.translations['user_name'] = 'username'
+        mdprovider.translations['user_name'] = 'username'
     
     .. note::
     
@@ -248,7 +248,7 @@ def make_sa_user_mdprovider(user_class=None, dbsession=None,
     Or, if you need translations::
     
         # ...
-        [plugin:sa_auth]
+        [plugin:sa_md]
         use = repoze.who.plugins.sa:make_sa_user_mdprovider
         user_class = yourcoolproject.model:User
         dbsession = yourcoolproject.model:DBSession
