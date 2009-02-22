@@ -35,10 +35,12 @@ Authenticator
 .. autofunction:: make_sa_authenticator
 
 
-Metadata provider
-=================
+Metadata providers
+==================
 
 .. autoclass:: SQLAlchemyUserMDPlugin
+
+.. autoclass:: SQLAlchemyStrictUserMDPlugin
 
 .. autofunction:: make_sa_user_mdprovider
 
