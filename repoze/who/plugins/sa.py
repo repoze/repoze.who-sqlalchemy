@@ -29,7 +29,8 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 
 __all__ = ['SQLAlchemyAuthenticatorPlugin', 'SQLAlchemyUserMDPlugin',
-           'make_sa_authenticator', 'make_sa_user_mdprovider']
+           'SQLAlchemyStrictUserMDPlugin', 'make_sa_authenticator',
+           'make_sa_user_mdprovider']
 
 
 class _BaseSQLAlchemyPlugin(object):
