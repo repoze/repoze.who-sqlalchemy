@@ -21,16 +21,13 @@ TODO: Write a function that configures both plugins in one go.
 """
 
 from zope.interface import implements
-from paste.httpexceptions import HTTPUnauthorized
-
 from repoze.who.interfaces import IAuthenticator, IMetadataProvider
 from repoze.who.utils import resolveDotted
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 
 __all__ = ['SQLAlchemyAuthenticatorPlugin', 'SQLAlchemyUserMDPlugin',
-           'SQLAlchemyStrictUserMDPlugin', 'make_sa_authenticator',
-           'make_sa_user_mdprovider']
+           'make_sa_authenticator', 'make_sa_user_mdprovider']
 
 
 class _BaseSQLAlchemyPlugin(object):
@@ -157,34 +154,6 @@ class SQLAlchemyUserMDPlugin(_BaseSQLAlchemyPlugin):
         identity['user'] = self.get_user(identity['repoze.who.userid'])
 
 
-class SQLAlchemyStrictUserMDPlugin(SQLAlchemyUserMDPlugin):
-    """
-    :class:`SQLAlchemyUserMDPlugin`-like MD provider which verifies that
-    the user account has not been deleted.
-    
-    This plugin is very useful to make sure that, even if the user's session
-    cookie is valid, :mod:`repoze.who` won't auto-authenticate a user whose
-    account has been deleted.
-    
-    It will raise a :class:`paste.httpexceptions.HTTPUnauthorized` exception
-    in such situations.
-    
-    """
-    
-    def add_metadata(self, environ, identity):
-        """
-        Call the parent MD provider.
-        
-        :raises HTTPUnauthorized: If the user account no longer exists.
-        
-        """
-        super(SQLAlchemyStrictUserMDPlugin, self).add_metadata(environ,
-                                                               identity)
-        if identity['user'] is None:
-            # The user has been deleted from the database
-            raise HTTPUnauthorized()
-
-
 #{ Functions to instantiate the plugins from a Paste configuration
 
 
@@ -213,8 +182,7 @@ def make_sa_authenticator(user_class=None, dbsession=None,
     :type dbsession: str
     :param user_name_translation: The translation for ``user_name``, if any.
     :type user_name_translation: str
-    :param validate_password_translation: The translation for 
-        ``validate_password``, if any.
+    :param validate_password_translation: The translation for ``validate_password``, if any.
     :type validate_password_translation: str
     :return: The authenticator.
     :rtype: SQLAlchemyAuthenticatorPlugin
@@ -255,7 +223,7 @@ def make_sa_authenticator(user_class=None, dbsession=None,
 
 
 def make_sa_user_mdprovider(user_class=None, dbsession=None, 
-                            user_name_translation=None, strict=False):
+                            user_name_translation=None):
     """
     Configure :class:`SQLAlchemyUserMDPlugin`.
     
@@ -265,9 +233,6 @@ def make_sa_user_mdprovider(user_class=None, dbsession=None,
     :type dbsession: str
     :param user_name_translation: The translation for ``user_name``, if any.
     :type user_name_translation: str
-    :param strict: Should :class:`SQLAlchemyStrictUserMDPlugin` be used instead
-        of :class:`SQLAlchemyUserMDPlugin`?
-    :type strict: bool
     :return: The metadata provider.
     :rtype: SQLAlchemyUserMDPlugin
     
@@ -278,17 +243,6 @@ def make_sa_user_mdprovider(user_class=None, dbsession=None,
         use = repoze.who.plugins.sa:make_sa_user_mdprovider
         user_class = yourcoolproject.model:User
         dbsession = yourcoolproject.model:DBSession
-        # ...
-    
-    Or, if you want :class:`the strict MD provider 
-    <SQLAlchemyStrictUserMDPlugin>`::
-    
-        # ...
-        [plugin:sa_md]
-        use = repoze.who.plugins.sa:make_sa_user_mdprovider
-        user_class = yourcoolproject.model:User
-        dbsession = yourcoolproject.model:DBSession
-        strict = True
         # ...
     
     Or, if you need translations::
@@ -305,16 +259,7 @@ def make_sa_user_mdprovider(user_class=None, dbsession=None,
     
     user_model, dbsession_object = _base_plugin_maker(user_class, dbsession)
     
-    if not isinstance(strict, bool):
-        if strict.lower() == 'true':
-            strict = True
-        else:
-            strict = False
-    
-    if strict:
-        mdprovider = SQLAlchemyStrictUserMDPlugin(user_model, dbsession_object)
-    else:
-        mdprovider = SQLAlchemyUserMDPlugin(user_model, dbsession_object)
+    mdprovider = SQLAlchemyUserMDPlugin(user_model, dbsession_object)
     
     if user_name_translation:
         mdprovider.translations['user_name'] = user_name_translation

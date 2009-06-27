@@ -21,29 +21,24 @@ Tests for the repoze.who SQLAlchemy MD provider.
 import unittest
 
 from zope.interface.verify import verifyClass
-from paste.httpexceptions import HTTPUnauthorized
 from repoze.who.interfaces import IMetadataProvider
 
 from repoze.who.plugins.sa import SQLAlchemyUserMDPlugin, \
-                                  SQLAlchemyStrictUserMDPlugin, \
                                   make_sa_user_mdprovider
 
 import databasesetup_sa
 from fixture import sa_model
 
 
-class BaseDMTester(unittest.TestCase):
-    """Base Test Case for the User MD provider's tests"""
+class TestMDProvider(unittest.TestCase):
+    """Tests for the authenticator function"""
     
     def setUp(self):
         databasesetup_sa.setup_database()
+        self.plugin = SQLAlchemyUserMDPlugin(sa_model.User, sa_model.DBSession)
     
     def tearDown(self):
         databasesetup_sa.teardownDatabase()
-
-
-class TestMDProvider(BaseDMTester):
-    """Tests for the MD provider"""
 
     def test_implements(self):
         verifyClass(IMetadataProvider, SQLAlchemyUserMDPlugin, tentative=True)
@@ -55,43 +50,18 @@ class TestMDProvider(BaseDMTester):
         expected_identity = {
             'repoze.who.userid': user.user_name,
             'user': user}
-        plugin = SQLAlchemyUserMDPlugin(sa_model.User, sa_model.DBSession)
-        plugin.add_metadata(None, identity)
+        self.plugin.add_metadata(None, identity)
         self.assertEqual(identity, expected_identity)
 
 
-class TestStrictMDProvider(BaseDMTester):
-    """Tests for the Strict MD provider"""
-
-    def test_implements(self):
-        verifyClass(IMetadataProvider, SQLAlchemyStrictUserMDPlugin,
-                    tentative=True)
-        
-    def test_existing_user(self):
-        user = sa_model.DBSession.query(sa_model.User).\
-               filter(sa_model.User.user_name==u'rms').one()
-        identity = {'repoze.who.userid': user.user_name}
-        expected_identity = {
-            'repoze.who.userid': user.user_name,
-            'user': user}
-        plugin = SQLAlchemyStrictUserMDPlugin(sa_model.User,
-                                              sa_model.DBSession)
-        plugin.add_metadata(None, identity)
-        self.assertEqual(identity, expected_identity)
-        
-    def test_non_existing_user(self):
-        identity = {'repoze.who.userid': u'i-dont-exist'}
-        plugin = SQLAlchemyStrictUserMDPlugin(sa_model.User,
-                                              sa_model.DBSession)
-        self.assertRaises(HTTPUnauthorized, plugin.add_metadata, None,
-                          identity)
-
-
-class TestMDProviderWithTranslations(BaseDMTester):
+class TestMDProviderWithTranslations(unittest.TestCase):
     """Tests for the translation functionality"""
     
     def setUp(self):
         databasesetup_sa.setup_database_with_translations()
+    
+    def tearDown(self):
+        databasesetup_sa.teardownDatabase()
     
     def test_it(self):
         self.plugin = SQLAlchemyUserMDPlugin(sa_model.Member,
@@ -109,7 +79,13 @@ class TestMDProviderWithTranslations(BaseDMTester):
         self.assertEqual(expected_identity, identity)
 
 
-class TestMDProviderMaker(BaseDMTester):
+class TestMDProviderMaker(unittest.TestCase):
+    
+    def setUp(self):
+        databasesetup_sa.setup_database()
+    
+    def tearDown(self):
+        databasesetup_sa.teardownDatabase()
     
     def test_simple_call(self):
         user_class = 'tests.fixture.sa_model:User'
@@ -134,24 +110,3 @@ class TestMDProviderMaker(BaseDMTester):
         self.assertTrue(isinstance(mdprovider, SQLAlchemyUserMDPlugin))
         self.assertEqual(username_translation,
                          mdprovider.translations['user_name'])
-    
-    def test_strict_user_md(self):
-        user_class = 'tests.fixture.sa_model:User'
-        dbsession = 'tests.fixture.sa_model:DBSession'
-        mdprovider = make_sa_user_mdprovider(user_class, dbsession,
-                                             strict=True)
-        self.assertTrue(isinstance(mdprovider, SQLAlchemyStrictUserMDPlugin))
-    
-    def test_strict_is_string(self):
-        user_class = 'tests.fixture.sa_model:User'
-        dbsession = 'tests.fixture.sa_model:DBSession'
-        # Strict == True
-        strict = 'True'
-        mdprovider = make_sa_user_mdprovider(user_class, dbsession,
-                                             strict=strict)
-        self.assertTrue(isinstance(mdprovider, SQLAlchemyStrictUserMDPlugin))
-        # Strict == False
-        strict = 'False'
-        mdprovider = make_sa_user_mdprovider(user_class, dbsession,
-                                             strict=strict)
-        self.assertTrue(isinstance(mdprovider, SQLAlchemyUserMDPlugin))
