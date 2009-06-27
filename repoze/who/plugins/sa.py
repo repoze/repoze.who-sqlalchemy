@@ -16,7 +16,7 @@
 """
 SQLAlchemy plugin for repoze.who.
 
-TODO: Write a function that configures both plugins in one go.
+TODO: Write a function that configures the three plugins in one go.
 
 """
 
@@ -26,11 +26,14 @@ from repoze.who.utils import resolveDotted
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 
-__all__ = ['SQLAlchemyAuthenticatorPlugin', 'SQLAlchemyUserMDPlugin',
-           'make_sa_authenticator', 'make_sa_user_mdprovider']
+__all__ = ("SQLAlchemyAuthenticatorPlugin", "SQLAlchemyUserMDPlugin",
+           "SQLAlchemyUserChecker", "make_sa_authenticator",
+           "make_sa_user_mdprovider")
 
 
 class _BaseSQLAlchemyPlugin(object):
+    
+    default_translations = {'user_name': "user_name"}
     
     def __init__(self, user_class, dbsession):
         """
@@ -58,6 +61,42 @@ class _BaseSQLAlchemyPlugin(object):
             # As recommended in the docs for repoze.who, it's important to
             # verify that there's only _one_ matching userid.
             return None
+
+
+class SQLAlchemyUserChecker(_BaseSQLAlchemyPlugin):
+    """
+    User existence checker for
+    :class:`repoze.who.plugins.auth_tkt.AuthTktCookiePlugin`.
+    
+    Example::
+    
+        from repoze.who.plugins.sa import SQLAlchemyUserChecker
+        from yourcoolproject.model import User, DBSession
+        
+        checker = SQLAlchemyUserChecker(User, DBSession)
+    
+    This plugin assumes that the user name is kept in the ``user_name``
+    attribute of the users' class. If you don't want to call it that way, then
+    you have to "translate" it as in the sample below::
+    
+        # You have User.username instead of User.user_name:
+        checker.translations['user_name'] = 'username'
+    
+    """
+    
+    def __call__(self, username):
+        """
+        Check whether a user account identified by ``username`` exists.
+        
+        :param username: The user account's id to be verified.
+        :type username: basestring
+        :return: Whether it exists or not.
+        :rtype: bool
+        
+        """
+        if self.get_user(username):
+            return True
+        return False
 
 
 #{ repoze.who plugins
@@ -99,14 +138,12 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
     
     implements(IAuthenticator)
     
-    default_translations = {
-            'user_name': 'user_name',
-            'validate_password': 'validate_password'
-        }
+    default_translations = _BaseSQLAlchemyPlugin.default_translations.copy()
+    default_translations['validate_password'] = "validate_password"
 
     # IAuthenticator
     def authenticate(self, environ, identity):
-        if not ('login' in identity and 'password' in identity):
+        if not ("login" in identity and "password" in identity):
             return None
         
         user = self.get_user(identity['login'])
@@ -148,8 +185,6 @@ class SQLAlchemyUserMDPlugin(_BaseSQLAlchemyPlugin):
     
     implements(IMetadataProvider)
     
-    default_translations = {'user_name': 'user_name'}
-    
     def add_metadata(self, environ, identity):
         identity['user'] = self.get_user(identity['repoze.who.userid'])
 
@@ -164,9 +199,9 @@ def _base_plugin_maker(user_class=None, dbsession=None):
     """
     
     if user_class is None:
-        raise ValueError('user_class must not be None')
+        raise ValueError("user_class must not be None")
     if dbsession is None:
-        raise ValueError('dbsession must not be None')
+        raise ValueError("dbsession must not be None")
     return resolveDotted(user_class), resolveDotted(dbsession)
 
 
@@ -182,7 +217,8 @@ def make_sa_authenticator(user_class=None, dbsession=None,
     :type dbsession: str
     :param user_name_translation: The translation for ``user_name``, if any.
     :type user_name_translation: str
-    :param validate_password_translation: The translation for ``validate_password``, if any.
+    :param validate_password_translation: The translation for 
+        ``validate_password``, if any.
     :type validate_password_translation: str
     :return: The authenticator.
     :rtype: SQLAlchemyAuthenticatorPlugin

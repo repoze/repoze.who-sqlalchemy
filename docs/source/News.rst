@@ -5,6 +5,15 @@
 This document describes the releases of :mod:`repoze.who.plugins.sa`.
 
 
+.. _repoze.who.plugins.sa-1.0rc2:
+
+:mod:`repoze.who.plugins.sa` 1.0rc2 (2009-06-27)
+================================================
+
+* Added :class:`repoze.who.plugins.sa.SQLAlchemyUserChecker`, a user checker
+  for :class:`repoze.who.plugins.auth_tkt.AuthTktCookiePlugin`.
+
+
 .. _repoze.who.plugins.sa-1.0rc1:
 
 :mod:`repoze.who.plugins.sa` 1.0rc1 (2009-01-26)

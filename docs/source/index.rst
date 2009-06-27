@@ -43,6 +43,12 @@ Metadata provider
 .. autofunction:: make_sa_user_mdprovider
 
 
+Miscellaneous
+=============
+
+.. autoclass:: SQLAlchemyUserChecker
+
+
 How to get help?
 ================
 

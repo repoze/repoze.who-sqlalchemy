@@ -48,12 +48,12 @@ setup(name='repoze.who.plugins.sa',
       include_package_data=True,
       zip_safe=False,
       tests_require=[
-          'repoze.who',
+          'repoze.who >= 1.0.14',
           'coverage',
           'nose',
-          'sqlalchemy >= 0.5.0rc4',
+          'sqlalchemy >= 0.5.0',
           'elixir'],
-      install_requires=['repoze.who', 'sqlalchemy >= 0.5.0rc4'],
+      install_requires=['repoze.who >= 1.0.14', 'sqlalchemy >= 0.5.0'],
       test_suite="nose.collector",
       entry_points = """\
       """
