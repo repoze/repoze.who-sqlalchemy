@@ -55,6 +55,11 @@ class _BaseSQLAlchemyPlugin(object):
         query = self.dbsession.query(self.user_class)
         query = query.filter(username_attr==username)
         
+        # A fresh transaction must be used to avoid using an invalid one. It's
+        # therefore assumed that at this point must've been successfully
+        # committed or rolled back.
+        self.dbsession.remove()
+        
         try:
             return query.one()
         except (NoResultFound, MultipleResultsFound):

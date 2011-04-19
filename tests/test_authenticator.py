@@ -20,8 +20,12 @@ Tests for the repoze.who SQLAlchemy authenticator.
 
 import unittest
 
-from zope.interface.verify import verifyClass
 from repoze.who.interfaces import IAuthenticator
+try:
+    from sqlalchemy.exceptions import IntegrityError
+except ImportError:
+    from sqlalchemy.exc import IntegrityError
+from zope.interface.verify import verifyClass
 
 from repoze.who.plugins.sa import SQLAlchemyAuthenticatorPlugin, \
                                   make_sa_authenticator
@@ -62,6 +66,23 @@ class TestAuthenticator(unittest.TestCase):
     def test_match(self):
         identity = {'login': u'rms', 'password': u'freedom'}
         self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
+    
+    def test_rollback(self):
+        """The session must be rolled back before use."""
+        # Make the transaction invalid by attempting to add an existing user:
+        try:
+            user = sa_model.User()
+            user.user_name = u"rms"
+            user.password = "free software"
+            sa_model.DBSession.add(user)
+            sa_model.DBSession.commit()
+        except IntegrityError:
+            pass
+        else:
+            self.fail("An IntegrityError must've been raised")
+        
+        identity = {'login': u'rms', 'password': u'freedom'}
+        self.plugin.authenticate(None, identity)
 
 
 class TestAuthenticatorWithTranslations(unittest.TestCase):
@@ -93,6 +114,23 @@ class TestAuthenticatorWithElixir(TestAuthenticator):
     
     def tearDown(self):
         databasesetup_elixir.teardownDatabase()
+    
+    def test_rollback(self):
+        """The session must be rolled back before use."""
+        # Make the transaction invalid by attempting to add an existing user:
+        try:
+            user = elixir_model.User()
+            user.user_name = u"rms"
+            user.password = "free software"
+            elixir_model.DBSession.add(user)
+            elixir_model.DBSession.commit()
+        except IntegrityError:
+            pass
+        else:
+            self.fail("An IntegrityError must've been raised")
+        
+        identity = {'login': u'rms', 'password': u'freedom'}
+        self.plugin.authenticate(None, identity)
 
 
 class TestAuthenticatorMaker(unittest.TestCase):

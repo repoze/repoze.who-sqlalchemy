@@ -20,8 +20,12 @@ Tests for the repoze.who SQLAlchemy MD provider.
 
 import unittest
 
-from zope.interface.verify import verifyClass
 from repoze.who.interfaces import IMetadataProvider
+try:
+    from sqlalchemy.exceptions import IntegrityError
+except ImportError:
+    from sqlalchemy.exc import IntegrityError
+from zope.interface.verify import verifyClass
 
 from repoze.who.plugins.sa import SQLAlchemyUserMDPlugin, \
                                   make_sa_user_mdprovider
@@ -51,7 +55,34 @@ class TestMDProvider(unittest.TestCase):
             'repoze.who.userid': user.user_name,
             'user': user}
         self.plugin.add_metadata(None, identity)
-        self.assertEqual(identity, expected_identity)
+        
+        self.assertEqual(identity.keys(), expected_identity.keys())
+        self.assertEqual(
+            expected_identity['repoze.who.userid'],
+            identity['repoze.who.userid'],
+            )
+        self.assertEqual(
+            expected_identity['user'].user_name,
+            identity['user'].user_name,
+            )
+        
+    
+    def test_rollback(self):
+        """The session must be rolled back before use."""
+        # Make the transaction invalid by attempting to add an existing user:
+        try:
+            user = sa_model.User()
+            user.user_name = u"rms"
+            user.password = "free software"
+            sa_model.DBSession.add(user)
+            sa_model.DBSession.commit()
+        except IntegrityError:
+            pass
+        else:
+            self.fail("An IntegrityError must've been raised")
+        
+        identity = {'repoze.who.userid': u"rms"}
+        self.plugin.add_metadata(None, identity)
 
 
 class TestMDProviderWithTranslations(unittest.TestCase):
@@ -76,7 +107,16 @@ class TestMDProviderWithTranslations(unittest.TestCase):
             'repoze.who.userid': member.member_name,
             'user': member}
         self.plugin.add_metadata(None, identity)
-        self.assertEqual(expected_identity, identity)
+        
+        self.assertEqual(expected_identity.keys(), identity.keys())
+        self.assertEqual(
+            expected_identity['repoze.who.userid'],
+            identity['repoze.who.userid'],
+            )
+        self.assertEqual(
+            expected_identity['user'].member_name,
+            identity['user'].member_name,
+            )
 
 
 class TestMDProviderMaker(unittest.TestCase):

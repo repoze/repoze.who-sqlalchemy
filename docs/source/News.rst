@@ -5,6 +5,16 @@
 This document describes the releases of :mod:`repoze.who.plugins.sa`.
 
 
+.. _unreleased:
+
+Unreleased
+==========
+
+* Queries issued by this plugin now use a fresh transaction, to avoid using
+  an invalid one (`which happens sometimes when repoze.who-friendlyform is used
+  <https://groups.google.com/forum/#!topic/pylons-discuss/DA8f4VyEEwM/discussion>`_).
+
+
 .. _repoze.who.plugins.sa-1.0rc2:
 
 :mod:`repoze.who.plugins.sa` 1.0rc2 (2009-06-27)
