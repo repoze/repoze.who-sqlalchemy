@@ -49,7 +49,7 @@ class _BaseSQLAlchemyPlugin(object):
     
     def get_user(self, username):
         # A fresh transaction must be used to avoid using an invalid one. It's
-        # therefore assumed that at this point must've been successfully
+        # therefore assumed that at this point it must've been successfully
         # committed or rolled back.
         self.dbsession.remove()
         
