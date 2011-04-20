@@ -48,17 +48,17 @@ class _BaseSQLAlchemyPlugin(object):
         self.translations = self.default_translations.copy()
     
     def get_user(self, username):
+        # A fresh transaction must be used to avoid using an invalid one. It's
+        # therefore assumed that at this point must've been successfully
+        # committed or rolled back.
+        self.dbsession.remove()
+        
         # Getting a translation:
         username_attr = getattr(self.user_class,
                                 self.translations['user_name'])
         
         query = self.dbsession.query(self.user_class)
         query = query.filter(username_attr==username)
-        
-        # A fresh transaction must be used to avoid using an invalid one. It's
-        # therefore assumed that at this point must've been successfully
-        # committed or rolled back.
-        self.dbsession.remove()
         
         try:
             return query.one()
