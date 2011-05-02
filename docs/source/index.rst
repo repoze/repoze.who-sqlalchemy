@@ -22,9 +22,9 @@ install it all by running::
 
     easy_install repoze.who.plugins.sa
 
-The development mainline is available at the following Subversion repository::
+The development mainline is available at the following Git repository::
 
-    http://svn.repoze.org/whoplugins/whoalchemy/trunk/
+    git://github.com/repoze/repoze.who-sqlalchemy.git
 
 
 Authenticator
@@ -52,11 +52,11 @@ Miscellaneous
 How to get help?
 ================
 
-The prefered place to ask questions is the `Repoze mailing list 
-<http://lists.repoze.org/listinfo/repoze-dev>`_ or the `#repoze 
-<irc://irc.freenode.net/#repoze>`_ IRC channel. Bugs reports and feature 
-requests should be sent to `the issue tracker of the Repoze project 
-<http://bugs.repoze.org/>`_.
+The prefered place to ask questions and request features is the
+`Repoze mailing list  <http://lists.repoze.org/listinfo/repoze-dev>`_.
+
+To report bugs, please go to `GitHub
+<https://github.com/repoze/repoze.who-sqlalchemy/issues>`_.
 
 
 Contents
