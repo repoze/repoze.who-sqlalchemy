@@ -189,4 +189,4 @@ latex_documents = [
 #latex_use_modindex = True
 
 
-intersphinx_mapping = {'http://static.repoze.org/whodocs/': None}
+intersphinx_mapping = {'http://docs.repoze.org/who/1.0/': None}
