@@ -104,6 +104,14 @@ class TestAuthenticatorWithTranslations(unittest.TestCase):
         identity = {'login': u'rms', 'password': u'freedom'}
         self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
 
+    def test_dummy_validate(self):
+        self.plugin = SQLAlchemyAuthenticatorPlugin(sa_model.User, 
+                                                    sa_model.DBSession)
+        self.plugin.translations['dummy_validate'] = sa_model.dummy_validate
+        identity = {'login': u'QWERTY', 'password': u'freedom'}
+        self.assertRaises(sa_model.DummyValidateException,
+                          self.plugin.authenticate, None, identity)
+
 
 class TestAuthenticatorWithElixir(TestAuthenticator):
     
@@ -179,3 +187,16 @@ class TestAuthenticatorMaker(unittest.TestCase):
                                    SQLAlchemyAuthenticatorPlugin))
         self.assertEqual(password_validator_translation,
                          authenticator.translations['validate_password'])
+
+    def test_dummy_validate_translation(self):
+        user_class = 'tests.fixture.sa_model:User'
+        dbsession = 'tests.fixture.sa_model:DBSession'
+        dummy_val_translation = 'tests.fixture.sa_model:dummy_validate'
+        authenticator = make_sa_authenticator(
+            user_class,
+            dbsession,
+            dummy_validate_translation=dummy_val_translation)
+        self.assertTrue(isinstance(authenticator, 
+                                   SQLAlchemyAuthenticatorPlugin))
+        self.assertEqual(sa_model.dummy_validate,
+                         authenticator.translations['dummy_validate'])
