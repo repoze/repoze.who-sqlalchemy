@@ -171,7 +171,6 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
         elif dummy_validator:
             # To prevent timing attacks
             dummy_validator(identity['password'])
-            return None
 
 
 class SQLAlchemyUserMDPlugin(_BaseSQLAlchemyPlugin):
