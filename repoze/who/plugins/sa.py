@@ -125,9 +125,9 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
     and such method is assumed to be called ``validate_password``).
 
     In order to prevent timing attacks, you could provide a validation function
-    through the ``dummy_validate`` translation (see below), which should use
-    the same algorithm as in ``validate_password``. This function will also
-    receive the password provided by the login form.
+    through the ``dummy_validate_password`` translation (see below), which
+    should use the same algorithm as in ``validate_password``. This function
+    will also only receive the password provided by the login form.
 
     If you don't want to call the attributes above as ``user_name`` and/or
     ``validate_password``, respectively, then you have to "translate" them as
@@ -141,7 +141,7 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
 
         # You have foo.bar.validate as a dummy validation function
         import foo.bar.validate
-        authenticator.translations['dummy_validate'] = foo.bar.validate
+        authenticator.translations['dummy_validate_password'] = foo.bar.validate
     
     .. note::
     
@@ -154,7 +154,7 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
     
     default_translations = _BaseSQLAlchemyPlugin.default_translations.copy()
     default_translations['validate_password'] = "validate_password"
-    default_translations['dummy_validate'] = None
+    default_translations['dummy_validate_password'] = None
 
     # IAuthenticator
     def authenticate(self, environ, identity):
@@ -162,15 +162,15 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
             return None
         
         user = self.get_user(identity['login'])
-        dummy_validate = self.translations['dummy_validate']
+        dummy_validator = self.translations['dummy_validate_password']
 
         if user:
             validator = getattr(user, self.translations['validate_password'])
             if validator(identity['password']):
                 return identity['login']
-        elif dummy_validate:
+        elif dummy_validator:
             # To prevent timing attacks
-            dummy_validate(identity['password'])
+            dummy_validator(identity['password'])
             return None
 
 
@@ -228,7 +228,7 @@ def _base_plugin_maker(user_class=None, dbsession=None):
 def make_sa_authenticator(user_class=None, dbsession=None, 
                           user_name_translation=None, 
                           validate_password_translation=None,
-                          dummy_validate_translation=None):
+                          dummy_validate_password_translation=None):
 
     """
     Configure :class:`SQLAlchemyAuthenticatorPlugin`.
@@ -242,9 +242,9 @@ def make_sa_authenticator(user_class=None, dbsession=None,
     :param validate_password_translation: The translation for 
         ``validate_password``, if any.
     :type validate_password_translation: str
-    :param dummy_validate_translation: The translation for ``dummy_validate``,
-        if any.
-    :type dummy_validate_translation: function
+    :param dummy_validate_password_translation: The translation for
+        ``dummy_validate_password``, if any.
+    :type dummy_validate_password_translation: function
     :return: The authenticator.
     :rtype: SQLAlchemyAuthenticatorPlugin
     
@@ -266,7 +266,7 @@ def make_sa_authenticator(user_class=None, dbsession=None,
         dbsession = yourcoolproject.model:DBSession
         user_name_translation = username
         validate_password_translation = verify_password
-        dummy_validate_translation = yourcoolproject.security:dummy_validate
+        dummy_validate_password_translation = yourcoolproject.security:validate
         # ...
     
     """
@@ -280,9 +280,9 @@ def make_sa_authenticator(user_class=None, dbsession=None,
     if validate_password_translation:
         authenticator.translations['validate_password'] = \
             validate_password_translation
-    if dummy_validate_translation:
-        authenticator.translations['dummy_validate'] = \
-            resolveDotted(dummy_validate_translation)
+    if dummy_validate_password_translation:
+        authenticator.translations['dummy_validate_password'] = \
+            resolveDotted(dummy_validate_password_translation)
     
     return authenticator
 
