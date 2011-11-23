@@ -32,6 +32,15 @@ DeclarativeBase = declarative_base()
 
 metadata = DeclarativeBase.metadata
 
+class DummyValidateException(BaseException):
+    """Dummy error used for dummy_validate."""
+    pass
+
+def dummy_validate(password):
+    """Dummy validation function that will only raise a dummy error to know
+    that we reached this execution path."""
+    raise DummyValidateException()
+
 def init_model(engine):
     """Call me before using any of the tables or classes in the model."""
     DBSession.configure(bind=engine)
