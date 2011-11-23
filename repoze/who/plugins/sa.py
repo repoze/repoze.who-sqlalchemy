@@ -124,11 +124,6 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
     login form (it receives the password to be verified as the only argument
     and such method is assumed to be called ``validate_password``).
 
-    In order to prevent timing attacks, you could provide a validation function
-    through the ``dummy_validate_password`` translation (see below), which
-    should use the same algorithm as in ``validate_password``. This function
-    will also only receive the password provided by the login form.
-
     If you don't want to call the attributes above as ``user_name`` and/or
     ``validate_password``, respectively, then you have to "translate" them as
     in the sample below::
@@ -139,14 +134,21 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
         # You have User.verify_password instead of User.validate_password:
         authenticator.translations['validate_password'] = 'verify_password'
 
-        # You have foo.bar.validate as a dummy validation function
-        import foo.bar.validate
-        authenticator.translations['dummy_validate_password'] = foo.bar.validate
+    If you would like to prevent `timing attacks
+    <http://en.wikipedia.org/wiki/Timing_attack>`_, you can provide a validation
+    function through the ``dummy_validate_password`` translation, which
+    should use the same algorithm as in ``validate_password``::
+
+        from yourcoolproject import validate_pass
+        authenticator.translations['dummy_validate_password'] = validate_pass
     
     .. note::
     
         If you want to configure this authenticator from an ``ini`` file, use
         :func:`make_sa_authenticator`.
+    
+    .. versionadded:: 1.0.1
+        Support for ``dummy_validate_password`` was added.
     
     """
     
@@ -267,6 +269,9 @@ def make_sa_authenticator(user_class=None, dbsession=None,
         validate_password_translation = verify_password
         dummy_validate_password_translation = yourcoolproject.security:validate
         # ...
+    
+    .. versionadded:: 1.0.1
+        Support for ``dummy_validate_password_translation`` was added.
     
     """
     

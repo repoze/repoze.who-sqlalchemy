@@ -5,6 +5,17 @@
 This document describes the releases of :mod:`repoze.who.plugins.sa`.
 
 
+.. _version-1.0.1:
+
+Version 1.0.1 (2011-11-23)
+==========================
+
+* Added ability to prevent from `timing attacks
+  <http://en.wikipedia.org/wiki/Timing_attack>`_. Thanks to `Arturo Sevilla
+  <https://github.com/repoze/repoze.who-sqlalchemy/pull/3>`_!
+
+
+
 .. _version-1.0:
 
 Version 1.0 Final (2011-05-02)
