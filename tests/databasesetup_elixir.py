@@ -22,6 +22,7 @@ from sqlalchemy.orm import *
 #from cStringIO import StringIO
 from io import StringIO
 from cgi import FieldStorage
+import repoze.who._compat as compat
 try:
     import elixir
     from .fixture.elixir_model import init_model, DBSession, metadata, User
@@ -38,29 +39,29 @@ else:
         # Creating users
     
         user = User()
-        user.user_name = u'rms'
-        user.password = u'freedom'
+        user.user_name = compat.u('rms')
+        user.password = compat.u('freedom')
         DBSession.add(user)
     
         user = User()
-        user.user_name = u'linus'
-        user.password = u'linux'
+        user.user_name = compat.u('linus')
+        user.password = compat.u('linux')
         DBSession.add(user)
     
         user = User()
-        user.user_name = u'sballmer'
-        user.password = u'developers'
+        user.user_name = compat.u('sballmer')
+        user.password = compat.u('developers')
         DBSession.add(user)
     
         # Plus a couple of users without groups
         user = User()
-        user.user_name = u'guido'
-        user.password = u'phytonic'
+        user.user_name = compat.u('guido')
+        user.password = compat.u('phytonic')
         DBSession.add(user)
     
         user = User()
-        user.user_name = u'rasmus'
-        user.password = u'php'
+        user.user_name = compat.u('rasmus')
+        user.password = compat.u('php')
         DBSession.add(user)
     
         DBSession.commit()

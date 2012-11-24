@@ -20,6 +20,7 @@ Tests for the repoze.who SQLAlchemy MD provider.
 
 import unittest
 
+import repoze.who._compat as compat
 from repoze.who.plugins.sa import SQLAlchemyUserChecker
 
 from . import databasesetup_sa
@@ -37,8 +38,8 @@ class TestUserChecker(unittest.TestCase):
         databasesetup_sa.teardownDatabase()
     
     def test_existing_user(self):
-        self.assertTrue(self.plugin(u"guido"))
+        self.assertTrue(self.plugin(compat.u("guido")))
     
     def test_non_existing_user(self):
-        self.assertFalse(self.plugin(u"gustavo"))
+        self.assertFalse(self.plugin(compat.u("gustavo")))
 

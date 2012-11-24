@@ -19,9 +19,9 @@ import os
 
 from sqlalchemy import *
 from sqlalchemy.orm import *
-#from cStringIO import StringIO
 from io import StringIO
 from cgi import FieldStorage
+import repoze.who._compat as compat
 
 from .fixture.sa_model import init_model, DBSession, metadata, User, Member
 
@@ -35,29 +35,29 @@ def setup_database():
     # Creating users
 
     user = User()
-    user.user_name = u'rms'
-    user.password = u'freedom'
+    user.user_name = compat.u('rms')
+    user.password = compat.u('freedom')
     DBSession.add(user)
 
     user = User()
-    user.user_name = u'linus'
-    user.password = u'linux'
+    user.user_name = compat.u('linus')
+    user.password = compat.u('linux')
     DBSession.add(user)
 
     user = User()
-    user.user_name = u'sballmer'
-    user.password = u'developers'
+    user.user_name = compat.u('sballmer')
+    user.password = compat.u('developers')
     DBSession.add(user)
 
     # Plus a couple of users without groups
     user = User()
-    user.user_name = u'guido'
-    user.password = u'phytonic'
+    user.user_name = compat.u('guido')
+    user.password = compat.u('phytonic')
     DBSession.add(user)
 
     user = User()
-    user.user_name = u'rasmus'
-    user.password = u'php'
+    user.user_name = compat.u('rasmus')
+    user.password = compat.u('php')
     DBSession.add(user)
 
     DBSession.commit()
@@ -70,29 +70,29 @@ def setup_database_with_translations():
     # Creating members
 
     member = Member()
-    member.member_name = u'rms'
-    member.password = u'freedom'
+    member.member_name = compat.u('rms')
+    member.password = compat.u('freedom')
     DBSession.add(member)
 
     member = Member()
-    member.member_name = u'linus'
-    member.password = u'linux'
+    member.member_name = compat.u('linus')
+    member.password = compat.u('linux')
     DBSession.add(member)
 
     member = Member()
-    member.member_name = u'sballmer'
-    member.password = u'developers'
+    member.member_name = compat.u('sballmer')
+    member.password = compat.u('developers')
     DBSession.add(member)
 
     # Plus a couple of members without groups
     member = Member()
-    member.member_name = u'guido'
-    member.password = u'phytonic'
+    member.member_name = compat.u('guido')
+    member.password = compat.u('phytonic')
     DBSession.add(member)
 
     member = Member()
-    member.member_name = u'rasmus'
-    member.password = u'php'
+    member.member_name = compat.u('rasmus')
+    member.password = compat.u('php')
     DBSession.add(member)
 
     DBSession.commit()

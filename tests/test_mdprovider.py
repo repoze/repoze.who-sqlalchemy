@@ -26,7 +26,7 @@ try:
 except ImportError:
     from sqlalchemy.exc import IntegrityError
 from zope.interface.verify import verifyClass
-
+import repoze.who._compat as compat
 from repoze.who.plugins.sa import SQLAlchemyUserMDPlugin, \
                                   make_sa_user_mdprovider
 
@@ -49,7 +49,7 @@ class TestMDProvider(unittest.TestCase):
         
     def test_it(self):
         user = sa_model.DBSession.query(sa_model.User).\
-               filter(sa_model.User.user_name==u'rms').one()
+               filter(sa_model.User.user_name==compat.u('rms')).one()
         identity = {'repoze.who.userid': user.user_name}
         expected_identity = {
             'repoze.who.userid': user.user_name,
@@ -72,7 +72,7 @@ class TestMDProvider(unittest.TestCase):
         # Make the transaction invalid by attempting to add an existing user:
         try:
             user = sa_model.User()
-            user.user_name = u"rms"
+            user.user_name = compat.u("rms")
             user.password = "free software"
             sa_model.DBSession.add(user)
             sa_model.DBSession.commit()
@@ -81,7 +81,7 @@ class TestMDProvider(unittest.TestCase):
         else:
             self.fail("An IntegrityError must've been raised")
         
-        identity = {'repoze.who.userid': u"rms"}
+        identity = {'repoze.who.userid': compat.u("rms")}
         self.plugin.add_metadata(None, identity)
 
 
@@ -101,7 +101,7 @@ class TestMDProviderWithTranslations(unittest.TestCase):
         self.plugin.translations['user_name'] = 'member_name'
         # Testing it...
         member = sa_model.DBSession.query(sa_model.Member).\
-                 filter(sa_model.Member.member_name==u'rms').one()
+                 filter(sa_model.Member.member_name==compat.u('rms')).one()
         identity = {'repoze.who.userid': member.member_name}
         expected_identity = {
             'repoze.who.userid': member.member_name,
