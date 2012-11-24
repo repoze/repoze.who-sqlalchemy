@@ -65,7 +65,7 @@ setup(name='repoze.who.plugins.sa',
       extras_require={
         "testing": tests_require,
       },
-      install_requires=['repoze.who >= 1.0.14', 'sqlalchemy >= 0.5.0'],
+      install_requires=['repoze.who >= 2.1b1', 'sqlalchemy >= 0.5.0'],
       test_suite="nose.collector",
       entry_points = """\
       """
