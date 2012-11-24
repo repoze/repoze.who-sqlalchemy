@@ -16,8 +16,11 @@
 ##############################################################################
 
 import os
+import sys
 
 from setuptools import setup, find_packages
+
+inPy3k = sys.version_info[0] == 3
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
@@ -28,7 +31,11 @@ tests_require = [
           'coverage',
           'nose',
           'sqlalchemy >= 0.5.0',
-          'elixir']
+]
+
+if not inPy3k:
+    tests_require.append('elixir')
+    tests_require.append('unittest2')
 
 setup(name='repoze.who.plugins.sa',
       version=version,
