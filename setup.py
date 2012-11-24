@@ -23,6 +23,13 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 version = open(os.path.join(here, 'VERSION.txt')).readline().rstrip()
 
+tests_require = [
+          'repoze.who >= 1.0.14',
+          'coverage',
+          'nose',
+          'sqlalchemy >= 0.5.0',
+          'elixir']
+
 setup(name='repoze.who.plugins.sa',
       version=version,
       description=('The repoze.who SQLAlchemy plugin'),
@@ -47,12 +54,10 @@ setup(name='repoze.who.plugins.sa',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      tests_require=[
-          'repoze.who >= 1.0.14',
-          'coverage',
-          'nose',
-          'sqlalchemy >= 0.5.0',
-          'elixir'],
+      tests_require=tests_require,
+      extras_require={
+        "testing": tests_require,
+      },
       install_requires=['repoze.who >= 1.0.14', 'sqlalchemy >= 0.5.0'],
       test_suite="nose.collector",
       entry_points = """\
