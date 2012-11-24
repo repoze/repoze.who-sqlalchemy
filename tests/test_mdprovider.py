@@ -30,8 +30,8 @@ from zope.interface.verify import verifyClass
 from repoze.who.plugins.sa import SQLAlchemyUserMDPlugin, \
                                   make_sa_user_mdprovider
 
-import databasesetup_sa
-from fixture import sa_model
+from . import databasesetup_sa
+from .fixture import sa_model
 
 
 class TestMDProvider(unittest.TestCase):

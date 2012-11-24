@@ -18,7 +18,12 @@ Tests for the repoze.who SQLAlchemy authenticator.
 
 """
 
-import unittest
+import sys
+inPy3k = sys.version_info[0] == 3
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from repoze.who.interfaces import IAuthenticator
 try:
@@ -30,8 +35,11 @@ from zope.interface.verify import verifyClass
 from repoze.who.plugins.sa import SQLAlchemyAuthenticatorPlugin, \
                                   make_sa_authenticator
 
-import databasesetup_sa, databasesetup_elixir
-from fixture import sa_model, elixir_model
+from . import databasesetup_sa
+from .fixture import sa_model
+if not inPy3k:
+    from . import databasesetup_elixir
+    from .fixture import elixir_model
 
 
 class TestAuthenticator(unittest.TestCase):
@@ -114,6 +122,7 @@ class TestAuthenticatorWithTranslations(unittest.TestCase):
                           self.plugin.authenticate, None, identity)
 
 
+@unittest.skipIf(inPy3k, "elixir does not supoort python3.")
 class TestAuthenticatorWithElixir(TestAuthenticator):
     
     def setUp(self):

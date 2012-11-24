@@ -22,8 +22,8 @@ import unittest
 
 from repoze.who.plugins.sa import SQLAlchemyUserChecker
 
-import databasesetup_sa
-from fixture import sa_model
+from . import databasesetup_sa
+from .fixture import sa_model
 
 
 class TestUserChecker(unittest.TestCase):

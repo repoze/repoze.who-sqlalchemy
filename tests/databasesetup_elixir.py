@@ -19,49 +19,53 @@ import os
 
 from sqlalchemy import *
 from sqlalchemy.orm import *
-from cStringIO import StringIO
+#from cStringIO import StringIO
+from io import StringIO
 from cgi import FieldStorage
-import elixir
-
-from fixture.elixir_model import init_model, DBSession, metadata, User
-
-engine = create_engine(os.environ.get('DBURL', 'sqlite://'))
-
-def setup_database():
-    init_model(engine)
-    teardownDatabase()
-    elixir.setup_all(True)
-    # Creating users
-
-    user = User()
-    user.user_name = u'rms'
-    user.password = u'freedom'
-    DBSession.add(user)
-
-    user = User()
-    user.user_name = u'linus'
-    user.password = u'linux'
-    DBSession.add(user)
-
-    user = User()
-    user.user_name = u'sballmer'
-    user.password = u'developers'
-    DBSession.add(user)
-
-    # Plus a couple of users without groups
-    user = User()
-    user.user_name = u'guido'
-    user.password = u'phytonic'
-    DBSession.add(user)
-
-    user = User()
-    user.user_name = u'rasmus'
-    user.password = u'php'
-    DBSession.add(user)
-
-    DBSession.commit()
-
-
-def teardownDatabase():
-    DBSession.rollback()
-    metadata.drop_all(engine)
+try:
+    import elixir
+    from .fixture.elixir_model import init_model, DBSession, metadata, User
+except ImportError:
+    pass
+else:
+    
+    engine = create_engine(os.environ.get('DBURL', 'sqlite://'))
+    
+    def setup_database():
+        init_model(engine)
+        teardownDatabase()
+        elixir.setup_all(True)
+        # Creating users
+    
+        user = User()
+        user.user_name = u'rms'
+        user.password = u'freedom'
+        DBSession.add(user)
+    
+        user = User()
+        user.user_name = u'linus'
+        user.password = u'linux'
+        DBSession.add(user)
+    
+        user = User()
+        user.user_name = u'sballmer'
+        user.password = u'developers'
+        DBSession.add(user)
+    
+        # Plus a couple of users without groups
+        user = User()
+        user.user_name = u'guido'
+        user.password = u'phytonic'
+        DBSession.add(user)
+    
+        user = User()
+        user.user_name = u'rasmus'
+        user.password = u'php'
+        DBSession.add(user)
+    
+        DBSession.commit()
+    
+    
+    def teardownDatabase():
+        DBSession.rollback()
+        metadata.drop_all(engine)

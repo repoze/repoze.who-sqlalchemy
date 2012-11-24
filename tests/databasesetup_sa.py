@@ -19,10 +19,11 @@ import os
 
 from sqlalchemy import *
 from sqlalchemy.orm import *
-from cStringIO import StringIO
+#from cStringIO import StringIO
+from io import StringIO
 from cgi import FieldStorage
 
-from fixture.sa_model import init_model, DBSession, metadata, User, Member
+from .fixture.sa_model import init_model, DBSession, metadata, User, Member
 
 engine = create_engine(os.environ.get('DBURL', 'sqlite://'))
 
