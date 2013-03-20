@@ -4,6 +4,20 @@
 
 This document describes the releases of :mod:`repoze.who.plugins.sa`.
 
+.. _version-unreleased:
+
+Next release
+============
+
+- Added support for PyPy.  As with Py3k, the ``Elixir`` support is
+  disabled until that package is ported.
+
+- Ported to Py3k using the "compatible subset" mode.
+  - Dropped support for Python < 2.6.x.
+  - Added tests for all supported Python versions via ``tox``.
+  - The ``Elixir`` support is disabled until that package is ported.
+  Thanks to Atsushi Odagiri (aodag) for the patch.
+
 
 .. _version-1.0.1:
 

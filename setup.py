@@ -16,11 +16,13 @@
 ##############################################################################
 
 import os
+import platform
 import sys
 
 from setuptools import setup, find_packages
 
 inPy3k = sys.version_info[0] == 3
+inPyPy = platform.python_implementation == 'PyPy'
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
@@ -31,7 +33,7 @@ tests_require = [
     'nose',
 ]
 
-if not inPy3k:
+if not inPy3k and not inPyPy:
     tests_require.append('elixir')
     tests_require.append('unittest2')
     # elixr 0.7.1 breaks with 0.8
@@ -56,6 +58,8 @@ setup(name='repoze.who.plugins.sa',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Database",
         "Topic :: Security",
         ],
