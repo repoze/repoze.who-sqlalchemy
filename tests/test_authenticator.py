@@ -18,7 +18,12 @@ Tests for the repoze.who SQLAlchemy authenticator.
 
 """
 
-import unittest
+import sys
+inPy3k = sys.version_info[0] == 3
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from repoze.who.interfaces import IAuthenticator
 try:
@@ -27,11 +32,15 @@ except ImportError:
     from sqlalchemy.exc import IntegrityError
 from zope.interface.verify import verifyClass
 
+import repoze.who._compat as compat
 from repoze.who.plugins.sa import SQLAlchemyAuthenticatorPlugin, \
                                   make_sa_authenticator
 
-import databasesetup_sa, databasesetup_elixir
-from fixture import sa_model, elixir_model
+from . import databasesetup_sa
+from .fixture import sa_model
+if not inPy3k:
+    from . import databasesetup_elixir
+    from .fixture import elixir_model
 
 
 class TestAuthenticator(unittest.TestCase):
@@ -60,19 +69,19 @@ class TestAuthenticator(unittest.TestCase):
         self.assertEqual(None, self.plugin.authenticate(None, identity))
         
     def test_no_match(self):
-        identity = {'login': u'gustavo', 'password': u'narea'}
+        identity = {'login': compat.u('gustavo'), 'password': compat.u('narea')}
         self.assertEqual(None, self.plugin.authenticate(None, identity))
         
     def test_match(self):
-        identity = {'login': u'rms', 'password': u'freedom'}
-        self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
+        identity = {'login': compat.u('rms'), 'password': compat.u('freedom')}
+        self.assertEqual(compat.u('rms'), self.plugin.authenticate(None, identity))
     
     def test_rollback(self):
         """The session must be rolled back before use."""
         # Make the transaction invalid by attempting to add an existing user:
         try:
             user = sa_model.User()
-            user.user_name = u"rms"
+            user.user_name = compat.u("rms")
             user.password = "free software"
             sa_model.DBSession.add(user)
             sa_model.DBSession.commit()
@@ -81,7 +90,7 @@ class TestAuthenticator(unittest.TestCase):
         else:
             self.fail("An IntegrityError must've been raised")
         
-        identity = {'login': u'rms', 'password': u'freedom'}
+        identity = {'login': compat.u('rms'), 'password': compat.u('freedom')}
         self.plugin.authenticate(None, identity)
 
 
@@ -101,19 +110,20 @@ class TestAuthenticatorWithTranslations(unittest.TestCase):
         self.plugin.translations['user_name'] = 'member_name'
         self.plugin.translations['validate_password'] = 'verify_pass'
         # Testing it...
-        identity = {'login': u'rms', 'password': u'freedom'}
-        self.assertEqual(u'rms', self.plugin.authenticate(None, identity))
+        identity = {'login': compat.u('rms'), 'password': compat.u('freedom')}
+        self.assertEqual(compat.u('rms'), self.plugin.authenticate(None, identity))
 
     def test_dummy_validate(self):
         self.plugin = SQLAlchemyAuthenticatorPlugin(sa_model.User, 
                                                     sa_model.DBSession)
         self.plugin.translations['dummy_validate_password'] = \
             sa_model.dummy_validate
-        identity = {'login': u'QWERTY', 'password': u'freedom'}
+        identity = {'login': compat.u('QWERTY'), 'password': compat.u('freedom')}
         self.assertRaises(sa_model.DummyValidateException,
                           self.plugin.authenticate, None, identity)
 
 
+@unittest.skipIf(inPy3k, "elixir does not supoort python3.")
 class TestAuthenticatorWithElixir(TestAuthenticator):
     
     def setUp(self):
@@ -129,7 +139,7 @@ class TestAuthenticatorWithElixir(TestAuthenticator):
         # Make the transaction invalid by attempting to add an existing user:
         try:
             user = elixir_model.User()
-            user.user_name = u"rms"
+            user.user_name = compat.u("rms")
             user.password = "free software"
             elixir_model.DBSession.add(user)
             elixir_model.DBSession.commit()
@@ -138,7 +148,7 @@ class TestAuthenticatorWithElixir(TestAuthenticator):
         else:
             self.fail("An IntegrityError must've been raised")
         
-        identity = {'login': u'rms', 'password': u'freedom'}
+        identity = {'login': compat.u('rms'), 'password': compat.u('freedom')}
         self.plugin.authenticate(None, identity)
 
 

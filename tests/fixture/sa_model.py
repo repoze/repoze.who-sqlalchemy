@@ -24,6 +24,7 @@ from sqlalchemy.types import String, Unicode, UnicodeText, Integer, DateTime, \
                              Boolean, Float
 from sqlalchemy.orm import scoped_session, sessionmaker, relation, backref, \
                            synonym
+import repoze.who._compat as compat
 
 
 DBSession = scoped_session(sessionmaker(autoflush=True, autocommit=False))
@@ -72,7 +73,7 @@ class User(DeclarativeBase):
     def __encrypt_password(self, password):
         """Hash the given password with SHA1."""
         
-        if isinstance(password, unicode):
+        if isinstance(password, compat.u):
             password_8bit = password.encode('UTF-8')
 
         else:
@@ -84,7 +85,7 @@ class User(DeclarativeBase):
 
         # make sure the hased password is an UTF-8 object at the end of the
         # process because SQLAlchemy _wants_ a unicode object for Unicode columns
-        if not isinstance(hashed_password, unicode):
+        if not isinstance(hashed_password, compat.u):
             hashed_password = hashed_password.decode('UTF-8')
 
         return hashed_password
@@ -130,7 +131,7 @@ class Member(DeclarativeBase):
     def __encrypt_password(self, password):
         """Hash the given password with SHA1."""
         
-        if isinstance(password, unicode):
+        if isinstance(password, compat.u):
             password_8bit = password.encode('UTF-8')
 
         else:
@@ -142,7 +143,7 @@ class Member(DeclarativeBase):
 
         # make sure the hased password is an UTF-8 object at the end of the
         # process because SQLAlchemy _wants_ a unicode object for Unicode columns
-        if not isinstance(hashed_password, unicode):
+        if not isinstance(hashed_password, compat.u):
             hashed_password = hashed_password.decode('UTF-8')
 
         return hashed_password

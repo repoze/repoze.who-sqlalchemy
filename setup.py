@@ -16,12 +16,28 @@
 ##############################################################################
 
 import os
+import sys
 
 from setuptools import setup, find_packages
+
+inPy3k = sys.version_info[0] == 3
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 version = open(os.path.join(here, 'VERSION.txt')).readline().rstrip()
+
+tests_require = [
+    'coverage',
+    'nose',
+]
+
+if not inPy3k:
+    tests_require.append('elixir')
+    tests_require.append('unittest2')
+    # elixr 0.7.1 breaks with 0.8
+    tests_require.append('sqlalchemy >= 0.5.0, <0.8dev')
+else:
+    tests_require.append('sqlalchemy >= 0.5.0')
 
 setup(name='repoze.who.plugins.sa',
       version=version,
@@ -34,6 +50,12 @@ setup(name='repoze.who.plugins.sa',
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
         "Topic :: Database",
         "Topic :: Security",
         ],
@@ -47,18 +69,15 @@ setup(name='repoze.who.plugins.sa',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      tests_require=[
-          'coverage',
-          'nose',
-          'sqlalchemy >= 0.5.0, <0.8dev', # elixr 0.7.1 breaks with 0.8
-          'elixir',
-      ],
+      tests_require=tests_require,
+      extras_require={
+        'testing': tests_require,
+      },
       install_requires=[
-          'repoze.who >= 1.0.14',
-          'sqlalchemy >= 0.5.0',
+        'repoze.who >= 2.1b1',
+        'sqlalchemy >= 0.5.0',
       ],
       test_suite="nose.collector",
       entry_points = """\
       """
-      )
-
+     )

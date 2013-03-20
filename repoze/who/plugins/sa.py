@@ -20,7 +20,7 @@ TODO: Write a function that configures the three plugins in one go.
 
 """
 
-from zope.interface import implements
+from zope.interface import implementer
 from repoze.who.interfaces import IAuthenticator, IMetadataProvider
 from repoze.who.utils import resolveDotted
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -107,6 +107,7 @@ class SQLAlchemyUserChecker(_BaseSQLAlchemyPlugin):
 #{ repoze.who plugins
 
 
+@implementer(IAuthenticator)
 class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
     """
     :mod:`repoze.who` authenticator for SQLAlchemy models.
@@ -152,7 +153,6 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
     
     """
     
-    implements(IAuthenticator)
     
     default_translations = _BaseSQLAlchemyPlugin.default_translations.copy()
     default_translations['validate_password'] = "validate_password"
@@ -175,6 +175,7 @@ class SQLAlchemyAuthenticatorPlugin(_BaseSQLAlchemyPlugin):
             dummy_validator(identity['password'])
 
 
+@implementer(IMetadataProvider)
 class SQLAlchemyUserMDPlugin(_BaseSQLAlchemyPlugin):
     """
     :mod:`repoze.who` metadata provider that loads the SQLAlchemy-powered
@@ -204,7 +205,6 @@ class SQLAlchemyUserMDPlugin(_BaseSQLAlchemyPlugin):
     
     """
     
-    implements(IMetadataProvider)
     
     def add_metadata(self, environ, identity):
         identity['user'] = self.get_user(identity['repoze.who.userid'])

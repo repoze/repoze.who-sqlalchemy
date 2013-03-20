@@ -19,50 +19,54 @@ import os
 
 from sqlalchemy import *
 from sqlalchemy.orm import *
-from cStringIO import StringIO
+#from cStringIO import StringIO
+from io import StringIO
 from cgi import FieldStorage
-import elixir
+import repoze.who._compat as compat
+try:
+    import elixir
+    from .fixture.elixir_model import init_model, DBSession, metadata, User
+except ImportError:
+    pass
+else:
 
-from fixture.elixir_model import init_model, DBSession, metadata, User
+    engine = create_engine(os.environ.get('DBURL', 'sqlite://'))
 
-engine = create_engine(os.environ.get('DBURL', 'sqlite://'))
+    def setup_database():
+        init_model(engine)
+        teardownDatabase()
+        elixir.setup_all(True)
+        # Creating users
 
-def setup_database():
-    init_model(engine)
-    teardownDatabase()
-    elixir.setup_all(True)
-    # Creating users
+        user = User()
+        user.user_name = compat.u('rms')
+        user.password = compat.u('freedom')
+        DBSession.add(user)
 
-    user = User()
-    user.user_name = u'rms'
-    user.password = u'freedom'
-    DBSession.add(user)
+        user = User()
+        user.user_name = compat.u('linus')
+        user.password = compat.u('linux')
+        DBSession.add(user)
 
-    user = User()
-    user.user_name = u'linus'
-    user.password = u'linux'
-    DBSession.add(user)
+        user = User()
+        user.user_name = compat.u('sballmer')
+        user.password = compat.u('developers')
+        DBSession.add(user)
 
-    user = User()
-    user.user_name = u'sballmer'
-    user.password = u'developers'
-    DBSession.add(user)
+        # Plus a couple of users without groups
+        user = User()
+        user.user_name = compat.u('guido')
+        user.password = compat.u('phytonic')
+        DBSession.add(user)
 
-    # Plus a couple of users without groups
-    user = User()
-    user.user_name = u'guido'
-    user.password = u'phytonic'
-    DBSession.add(user)
+        user = User()
+        user.user_name = compat.u('rasmus')
+        user.password = compat.u('php')
+        DBSession.add(user)
 
-    user = User()
-    user.user_name = u'rasmus'
-    user.password = u'php'
-    DBSession.add(user)
+        DBSession.commit()
 
-    DBSession.commit()
-
-
-def teardownDatabase():
-    DBSession.rollback()
-    metadata.drop_all(engine)
-    DBSession.remove()
+    def teardownDatabase():
+        DBSession.rollback()
+        metadata.drop_all(engine)
+        DBSession.remove()
