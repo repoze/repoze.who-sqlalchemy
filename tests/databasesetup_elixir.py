@@ -65,3 +65,4 @@ def setup_database():
 def teardownDatabase():
     DBSession.rollback()
     metadata.drop_all(engine)
+    DBSession.remove()

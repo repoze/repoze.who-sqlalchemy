@@ -100,4 +100,5 @@ def setup_database_with_translations():
 def teardownDatabase():
     DBSession.rollback()
     metadata.drop_all(engine)
+    DBSession.remove()
 
